@@ -102,7 +102,7 @@ export class ListPollutions implements OnInit {
 
     // For every trigger (refresh or filter change) request the API (switchMap cancels previous requests)
     this.submittedPollutions$ = trigger$.pipe(
-      switchMap(([search, type]) => this.pollutionApi.getPollutions(search, type))
+      switchMap(([search, type]) => this.pollutionApi.getPollutions(search ?? undefined, type ?? undefined))
     );
 
     // The UI consumes filtered results (server-side filtering); keep the same observable name

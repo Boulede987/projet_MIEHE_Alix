@@ -8,7 +8,22 @@ const Op = db.Sequelize.Op;
 exports.get = (req, res) => 
 {
 
-  Pollution.findAll()
+  const { q, type } = req.query;
+
+  const where = {};
+
+  if (q && q.trim() !== '') {
+    where[Op.or] = [
+      { titre: { [Op.like]: `%${q}%` } },
+      { description: { [Op.like]: `%${q}%` } }
+    ];
+  }
+
+  if (type && type.trim() !== '') {
+    where.type_pollution = type;
+  }
+
+  Pollution.findAll({ where })
   .then(
     data => {
       res.send(data);

@@ -13,11 +13,9 @@
     <app-pollution-recap [pollution]="pollution"></app-pollution-recap>
     
     <button (click)="onDelete(pollution)">
-    <!-- <button> -->
         Supprimer
     </button>
     <button (click)="onEdit(pollution)">
-    <!-- <button> -->
         Modifier
     </button>
     @if (isConnected$ | async) {
