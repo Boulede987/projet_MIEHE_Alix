@@ -20,7 +20,7 @@ import { UserApi } from '../../services/userApi/user-api';
 })
 export class FormUserLogin {
 
-  userForm = new FormGroup({
+  readonly userForm = new FormGroup({
     email: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] }),
     password: new FormControl<string>('', { nonNullable: true, validators: [Validators.required] })
   });

@@ -11,7 +11,6 @@ export class SubmittedPollution {
   lieu: string = ''
   longitude: number = 0
   latitude: number = 0
-  // optional fields for upload and ownership
   photo_base64?: string | null = null
   userId?: number | null = null
 }

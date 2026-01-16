@@ -9,13 +9,13 @@ import { Auth } from '../../../auth_managment/authentification-store/models/auth
 
 @Component({
   selector: 'app-pollution-navbar',
-  imports: [AsyncPipe, RouterModule, FavoritePollutionsTag], // nécessaire pour la naviguation via router
+  imports: [AsyncPipe, RouterModule, FavoritePollutionsTag],
   templateUrl: './pollution-navbar.html',
   styleUrl: './pollution-navbar.scss'
 })
 export class PollutionNavbar {
 
-  private store = inject(Store);
+  private readonly store = inject(Store);
 
   isConnected$: Observable<boolean> = this.store.select(AuthState.isConnected);
   isAdmin$: Observable<boolean> = this.store.select(AuthState.isAdmin);

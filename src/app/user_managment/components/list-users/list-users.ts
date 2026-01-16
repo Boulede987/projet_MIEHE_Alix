@@ -21,10 +21,7 @@ import { UserRecap } from '../user-recap/user-recap';
 export class ListUsers {
 
   private readonly userApi = inject(UserApi);
-  private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
-
-  readonly showForm = false;
 
   readonly searchFilter = new FormControl<string>('', { nonNullable: true });
   readonly typeFilter = new FormControl<string>('', { nonNullable: true });

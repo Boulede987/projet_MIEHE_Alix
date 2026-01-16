@@ -16,10 +16,10 @@ import { map, of } from 'rxjs';
 })
 export class ListFavoritePollutions {
   
-  private store = inject(Store);
-  private pollutionApi = inject(PollutionAPI);
+  private readonly store = inject(Store);
+  private readonly pollutionApi = inject(PollutionAPI);
 
-  favorites = this.store.selectSignal(FavoritePollutionsState.items);
+  readonly favorites = this.store.selectSignal(FavoritePollutionsState.items);
 
   favoritePollutions$ = 
     this.favorites().length ? this.pollutionApi.getPollutions().pipe(

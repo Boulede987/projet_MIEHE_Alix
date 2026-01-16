@@ -9,7 +9,7 @@ import { FavoritePollutionsState } from '../../pollution-store/states/favorite-p
   styleUrl: './favorite-pollutions-tag.scss'
 })
 export class FavoritePollutionsTag {
-  private store = inject(Store);
+  private readonly store = inject(Store);
 
   favoritesCount = this.store.selectSignal(FavoritePollutionsState.count);
 }

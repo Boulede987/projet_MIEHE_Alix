@@ -17,17 +17,18 @@ import { POLLUTION_TYPES } from '../../classes/submittedPollution/submitted-poll
 })
 export class FormDelcarationPollution implements OnInit {
 
+  
+  private readonly store = inject(Store);
+
   pollution ? : SubmittedPollution
 
   submitted : boolean = false
   isEditMode : boolean = false
   loading : boolean = false
   photoBase64: string | null = null
-  pollutionTypes = POLLUTION_TYPES;
+  readonly pollutionTypes = POLLUTION_TYPES;
   
-  pollutionForm = new FormGroup({
-    // Validators.required -> oblige re remplir le formulaire, d'une certaine manière
-    // le bouton submt n'est pas utilisable tant que ce n'est pas valide
+  readonly pollutionForm = new FormGroup({
     titre: new FormControl('', [Validators.required, Validators.minLength(3)]),
     type_pollution: new FormControl('', [Validators.required]),
     description: new FormControl('', [Validators.required, Validators.minLength(10)]),
@@ -46,10 +47,9 @@ export class FormDelcarationPollution implements OnInit {
     private cdr: ChangeDetectorRef 
   ) 
   {
-    // constructor left intentionally minimal
+    //
   }
 
-  private store = inject(Store);
 
   ngOnInit(): void {
     this.loadPollutionIfEditing();
@@ -75,7 +75,7 @@ export class FormDelcarationPollution implements OnInit {
     }
   }
 
-  // Helpers extracted from long methods to improve readability
+
   private getPollutionIdFromRoute(): number | null {
     const idStr = this.route.snapshot.paramMap.get('id');
     if (!idStr) return null;
@@ -188,7 +188,6 @@ export class FormDelcarationPollution implements OnInit {
           const ctx = canvas.getContext('2d');
           if (!ctx) return reject(new Error('Canvas not supported'));
           ctx.drawImage(img, 0, 0, width, height);
-          // convert to jpeg to reduce size
           const dataUrl = canvas.toDataURL('image/jpeg', quality);
           resolve(dataUrl);
         };
@@ -198,7 +197,6 @@ export class FormDelcarationPollution implements OnInit {
     });
   }
 
-  // returns a source for preview: either the newly selected base64 or existing photo_base64 from server
   previewSrc(): string | null {
     return this.photoBase64 ?? (this.pollution ? this.pollution.photo_base64 ?? null : null);
   }

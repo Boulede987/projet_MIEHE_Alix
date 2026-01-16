@@ -22,28 +22,20 @@ import { POLLUTION_TYPES, PollutionType } from '../../classes/submittedPollution
 })
 export class ListPollutions implements OnInit {
 
-  // REFRESH DISPLAY
   private refreshTrigger$ = new Subject<void>();
 
-  // LIST POLLUTIONS
   submittedPollutions$ ? : Observable<SubmittedPollution[]>
   filteredPollutions$ ! : Observable<SubmittedPollution[]>
 
-  // FILTER
   searchFilter = new FormControl('')
   typeFilter = new FormControl('')
-  pollutionTypes = POLLUTION_TYPES;
+  readonly pollutionTypes = POLLUTION_TYPES;
 
-  showForm : boolean = false // pour permette l'édition via formulaire
+  private readonly store = inject(Store);
 
-  // injecting store before constructor
-  private store = inject(Store);
-
-  // FAVORITES
-  favorites = this.store.selectSignal(FavoritePollutionsState.items);
-  isFavorite = this.store.selectSignal(FavoritePollutionsState.isFavorite);
-  isConnected$: Observable<boolean> = this.store.select(AuthState.isConnected);
-
+  readonly favorites = this.store.selectSignal(FavoritePollutionsState.items);
+  readonly isFavorite = this.store.selectSignal(FavoritePollutionsState.isFavorite);
+  readonly isConnected$: Observable<boolean> = this.store.select(AuthState.isConnected);
   constructor
   (
     private pollutionApi : PollutionAPI,
@@ -66,7 +58,6 @@ export class ListPollutions implements OnInit {
       this.pollutionApi.deletePollution(pollution).subscribe({
         next: (response) => {
           console.log('Pollution deleted:', response);
-          // Rediriger ou rafraîchir la liste
           this.refreshTrigger$.next(); 
         },
         error: (error) => {

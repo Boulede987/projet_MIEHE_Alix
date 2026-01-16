@@ -42,9 +42,9 @@ export class FormCreateUser implements OnInit
   loading : boolean = false
 
   
-  userRoles = USER_ROLES;
+  readonly userRoles = USER_ROLES;
   
-  userForm = new FormGroup({
+  readonly userForm = new FormGroup({
     username: new FormControl('', [Validators.required, Validators.minLength(3)]),
     email: new FormControl('', [Validators.required, strictEmailValidator]),
     password: new FormControl('', [Validators.required, Validators.minLength(6), strictPasswordValidator]),

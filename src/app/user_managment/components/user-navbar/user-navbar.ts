@@ -14,8 +14,8 @@ import { AuthDeconnexion } from '../../../auth_managment/authentification-store/
 })
 export class UserNavbar {
 
-  private store = inject(Store);
-  private router = inject(Router);
+  private readonly store = inject(Store);
+  private readonly router = inject(Router);
 
   isConnected$: Observable<boolean> = this.store.select(AuthState.isConnected);
   isAdmin$: Observable<boolean> = this.store.select(AuthState.isAdmin);

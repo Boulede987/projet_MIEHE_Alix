@@ -18,7 +18,7 @@ import { AuthDeconnexion } from '../auth_managment/authentification-store/action
 @Injectable()
 export class ApiHttpInterceptor implements HttpInterceptor {
 
-  private store = inject(Store);
+  private readonly store = inject(Store);
 
   constructor(private auth: AuthService) {}
 
