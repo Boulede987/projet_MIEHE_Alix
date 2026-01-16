@@ -7,7 +7,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SubmittedPollution } from '../../classes/submittedPollution/submitted-pollution';
 import { PollutionRecap } from '../pollution-recap/pollution-recap';
 import { PollutionAPI } from '../../services/pollution-api';
-import { POLLUTION_TYPES, PollutionType } from '../../classes/submittedPollution/submitted-pollution';
+import { POLLUTION_TYPES } from '../../classes/submittedPollution/submitted-pollution';
 
 @Component({
   selector: 'app-form-delcaration-pollution',
@@ -46,119 +46,106 @@ export class FormDelcarationPollution implements OnInit {
     private cdr: ChangeDetectorRef 
   ) 
   {
-    //
+    // constructor left intentionally minimal
   }
 
-  // inject store for user info
   private store = inject(Store);
 
-
-  ngOnInit() 
-  {
-
-    // On verifie si on as un id dans l'url
-    const pollutionId : number = parseInt(this.route.snapshot.paramMap.get('id')!)
-    
-    if (pollutionId) 
-    {
-
-      // si on en as un, on est en mode edition
-      this.isEditMode = true;
-
-      this.pollutionApi.getPollutionById(pollutionId)
-      .subscribe(
-        foundPollution => 
-        {
-
-          this.pollution = foundPollution;
-
-          // on récupère les données de l'objet pollution
-          const formValue = 
-          {
-            id: this.pollution.id.toString(),
-            titre: this.pollution.titre,
-            type_pollution: this.pollution.type_pollution,
-            description: this.pollution.description,
-            date_observation: this.pollution.date_observation.toString(),
-            lieu: this.pollution.lieu,
-            longitude: this.pollution.longitude.toString(),
-            latitude: this.pollution.latitude.toString()
-          };
-
-          this.pollutionForm.patchValue(formValue); // et on les ajoutes dans le formulaire pour le pré remplir
-        }
-      );
-    }
-    // si on as pas d'id, on reste en mode creation (isEditMode reste a false)
-
+  ngOnInit(): void {
+    this.loadPollutionIfEditing();
   }
 
 
   onSubmit()
   {
-    if (!this.loading)
-    {
-      this.loading = true
-      this.pollution = Object.assign(new SubmittedPollution(), this.pollutionForm.value)
-    
-      if (this.isEditMode && this.pollution) // si on est en mode edition
-      {
-        // Récupérer l'ID depuis l'URL (pas depuis le formulaire)
-        const pollutionId = parseInt(this.route.snapshot.paramMap.get('id')!);
-        this.pollution.id = pollutionId; 
-        
-        // attach base64 image if provided
-        if (this.photoBase64 && this.pollution) {
-          this.pollution.photo_base64 = this.photoBase64;
-        }
+    if (this.loading) return;
+    this.loading = true;
 
-        // attach current user id if available
-        const currentUser = this.store.selectSnapshot(AuthState.getUser);
-        if (currentUser && currentUser.id && this.pollution) {
-          this.pollution.userId = currentUser.id;
-        }
+    const prepared = this.preparePollutionFromForm();
+    this.pollution = prepared;
 
-        this.pollutionApi.putPollution(this.pollution).subscribe({
-          next: (response) => {
-            console.log('Pollution updated:', response);
-            this.submitted = true;
-            this.cdr.detectChanges(); // détection des changements pour que submitted mette à jour l'affichage
-            this.loading = false
-          },
-          error: (error) => {
-            console.error('Error updating pollution:', error)
-            this.loading = false
-          }
-        });
-      }
-      else  // sinon, on est en creation
-      {
-        // Ne pas générer l'ID manuellement, laissez la base de données le faire (autoIncrement)
-        // attach base64 image if provided
-        if (this.photoBase64 && this.pollution) {
-          this.pollution.photo_base64 = this.photoBase64;
-        }
-
-        // attach current user id if available
-        const currentUser = this.store.selectSnapshot(AuthState.getUser);
-        if (currentUser && currentUser.id && this.pollution) {
-          this.pollution.userId = currentUser.id;
-        }
-
-        this.pollutionApi.postPollution(this.pollution).subscribe({
-          next: (response) => {
-            console.log('Pollution created:', response);
-            this.submitted = true;
-            this.cdr.detectChanges(); // détection des changements pour que submitted mette à jour l'affichage
-            this.loading = false
-          },
-          error: (error) => {
-            console.error('Error creating pollution:', error)
-            this.loading = false
-          }
-        });
-      }
+    if (this.isEditMode) {
+      const id = this.getPollutionIdFromRoute();
+      if (id != null) prepared.id = id;
+      this.attachPhotoAndUser(prepared);
+      this.submitEdit(prepared);
+    } else {
+      this.attachPhotoAndUser(prepared);
+      this.submitCreate(prepared);
     }
+  }
+
+  // Helpers extracted from long methods to improve readability
+  private getPollutionIdFromRoute(): number | null {
+    const idStr = this.route.snapshot.paramMap.get('id');
+    if (!idStr) return null;
+    const id = parseInt(idStr, 10);
+    return Number.isNaN(id) ? null : id;
+  }
+
+  private loadPollutionIfEditing() {
+    const pollutionId = this.getPollutionIdFromRoute();
+    if (!pollutionId) return;
+
+    this.isEditMode = true;
+    this.pollutionApi.getPollutionById(pollutionId).subscribe(found => {
+      this.pollution = found;
+      this.applyPollutionToForm(found);
+    });
+  }
+
+  private applyPollutionToForm(p: SubmittedPollution) {
+    const formValue = {
+      id: p.id?.toString(),
+      titre: p.titre,
+      type_pollution: p.type_pollution,
+      description: p.description,
+      date_observation: p.date_observation?.toString(),
+      lieu: p.lieu,
+      longitude: p.longitude?.toString(),
+      latitude: p.latitude?.toString()
+    };
+    this.pollutionForm.patchValue(formValue);
+  }
+
+  private preparePollutionFromForm(): SubmittedPollution {
+    return Object.assign(new SubmittedPollution(), this.pollutionForm.value);
+  }
+
+  private attachPhotoAndUser(pollution: SubmittedPollution) {
+    if (this.photoBase64) pollution.photo_base64 = this.photoBase64;
+    const currentUser = this.store.selectSnapshot(AuthState.getUser);
+    if (currentUser && currentUser.id) pollution.userId = currentUser.id;
+  }
+
+  private submitEdit(pollution: SubmittedPollution) {
+    this.pollutionApi.putPollution(pollution).subscribe({
+      next: response => {
+        console.log('Pollution updated:', response);
+        this.submitted = true;
+        this.cdr.detectChanges();
+        this.loading = false;
+      },
+      error: err => {
+        console.error('Error updating pollution:', err);
+        this.loading = false;
+      }
+    });
+  }
+
+  private submitCreate(pollution: SubmittedPollution) {
+    this.pollutionApi.postPollution(pollution).subscribe({
+      next: response => {
+        console.log('Pollution created:', response);
+        this.submitted = true;
+        this.cdr.detectChanges();
+        this.loading = false;
+      },
+      error: err => {
+        console.error('Error creating pollution:', err);
+        this.loading = false;
+      }
+    });
   }
 
 

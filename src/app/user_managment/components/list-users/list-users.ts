@@ -1,8 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject } from '@angular/core';
 import { AsyncPipe } from '@angular/common';
+import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FormControl, ReactiveFormsModule } from '@angular/forms'; 
-import { Observable, combineLatest, map, startWith, Subject, switchMap } from 'rxjs';
+
+import { Observable, Subject, combineLatest } from 'rxjs';
+import { map, startWith, switchMap, shareReplay } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { User } from '../../classes/user/user';
 import { UserApi } from '../../services/userApi/user-api';
@@ -10,102 +13,71 @@ import { UserRecap } from '../user-recap/user-recap';
 
 @Component({
   selector: 'app-list-users',
+  standalone: true,
   imports: [AsyncPipe, UserRecap, ReactiveFormsModule],
   templateUrl: './list-users.html',
-  styleUrl: './list-users.scss'
+  styleUrl: './list-users.scss',
 })
 export class ListUsers {
-  private refreshTrigger$ = new Subject<void>();
 
-  users$ ? : Observable<User[]>
-  filteredUsers$ ! : Observable<User[]>
+  private readonly userApi = inject(UserApi);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
-  searchFilter = new FormControl('')
-  typeFilter = new FormControl('')
+  readonly showForm = false;
 
-  showForm : boolean = false // pour permette l'édition via formulaire
+  readonly searchFilter = new FormControl<string>('', { nonNullable: true });
+  readonly typeFilter = new FormControl<string>('', { nonNullable: true });
 
-  constructor
-  (
-    private userApi : UserApi,
-    private router: Router
-  )
-  {
-    //
+  private readonly refreshTrigger$ = new Subject<void>();
+
+  readonly users$: Observable<User[]> = this.createUsersStream();
+  readonly filteredUsers$: Observable<User[]> = this.createFilteredUsersStream();
+
+  ngOnInit(): void {
+    this.refresh();
   }
 
-  
-  ngOnInit() 
-  {
-
-    this.loadUsers()
-
+  refresh(): void {
+    this.refreshTrigger$.next();
   }
 
-
-
-  // onDelete(user: User) {
-  //   if (confirm('Êtes-vous sûr de vouloir supprimer cette pollution ?')) {
-  //     this.userApi.deleteUser(user).subscribe({
-  //       next: (response) => {
-  //         console.log('Pollution deleted:', response);
-  //         // Rediriger ou rafraîchir la liste
-  //         this.refreshTrigger$.next(); 
-  //       },
-  //       error: (error) => {
-  //         console.error('Error deleting pollution:', error);
-  //       }
-  //     });
-  //   }
-  // }
-
-
-  // onEdit(user: User) {
-  //   this.router.navigate(['/user/edit', user.id]);
-  // }
-
-
-
-
-  loadUsers()
-  {
-    // this.submittedPollutions$ = this.pollutionApi.getPollutions()
-    this.users$ = this.refreshTrigger$.pipe(
-      startWith(undefined), // <- Charge au démarrage
-      switchMap(() => this.userApi.getUsers()) // <- Recharge à chaque émission
-    );
-
-    // Combinaison du stream de données original aves les filters controls
-    this.filteredUsers$ = 
-    combineLatest
-    (
-      [
-        this.users$,
-        this.searchFilter.valueChanges.pipe(startWith('')),
-        this.typeFilter.valueChanges.pipe(startWith(''))
-      ]
-    )
-    .pipe
-    (
-      map( ( [users, searchTerm] ) => 
-        {
-          return users.filter( user => 
-            {
-              // filtrer selon le titre et la description
-              const matchesSearch : boolean = 
-              ( 
-                !searchTerm // si on as pas de filtre
-                || 
-                user.username?.toLowerCase().includes(searchTerm.toLowerCase()) // si le nom de l'utilisateur correpsond
-                ||
-                user.email?.toLowerCase().includes(searchTerm.toLowerCase()) // si l'email de l'utilisateur correspond
-              )
-              
-              return matchesSearch
-            })
-        }
-      )
+  private createUsersStream(): Observable<User[]> {
+    return this.refreshTrigger$.pipe(
+      startWith(void 0),
+      switchMap(() => this.userApi.getUsers()),
+      shareReplay({ bufferSize: 1, refCount: true }),
+      takeUntilDestroyed(this.destroyRef)
     );
   }
 
+  private createFilteredUsersStream(): Observable<User[]> {
+    return combineLatest([
+      this.users$,
+      this.searchFilter.valueChanges.pipe(startWith(this.searchFilter.value)),
+      this.typeFilter.valueChanges.pipe(startWith(this.typeFilter.value)),
+    ]).pipe(
+      map(([users, searchTerm]) => this.filterUsers(users, searchTerm)),
+      takeUntilDestroyed(this.destroyRef)
+    );
+  }
+
+  private filterUsers(users: User[], searchTerm: string): User[] {
+    if (!searchTerm) {
+      return users;
+    }
+
+    const normalized = searchTerm.toLowerCase();
+
+    return users.filter(user =>
+      this.matchesSearch(user, normalized)
+    );
+  }
+
+  private matchesSearch(user: User, search: string): boolean {
+    return (
+      user.username?.toLowerCase().includes(search) === true ||
+      user.email?.toLowerCase().includes(search) === true
+    );
+  }
 }

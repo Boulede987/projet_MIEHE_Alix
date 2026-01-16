@@ -86,7 +86,6 @@ export class ListPollutions implements OnInit {
 
   loadPollutions()
   {
-    // Debounced filter stream (user typing)
     const filters$ = combineLatest([
       this.searchFilter.valueChanges.pipe(startWith('')),
       this.typeFilter.valueChanges.pipe(startWith(''))
@@ -96,18 +95,15 @@ export class ListPollutions implements OnInit {
       distinctUntilChanged((a, b) => a[0] === b[0] && a[1] === b[1])
     );
 
-    // Merge refresh trigger and filters; start with empty filters to load initial list
     const trigger$ = merge(
       this.refreshTrigger$.pipe(map(() => ['', ''] as [string, string])),
       filters$
     ).pipe(startWith(['', '']));
 
-    // For every trigger (refresh or filter change) request the API (switchMap cancels previous requests)
     this.submittedPollutions$ = trigger$.pipe(
       switchMap(([search, type]) => this.pollutionApi.getPollutions(search ?? undefined, type ?? undefined))
     );
 
-    // The UI consumes filtered results (server-side filtering); keep the same observable name
     this.filteredPollutions$ = this.submittedPollutions$;
   }
 

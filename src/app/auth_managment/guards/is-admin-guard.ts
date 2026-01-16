@@ -10,7 +10,6 @@ export class IsAdminGuard implements CanActivate {
   canActivate(): boolean {
     const isAdmin = this.store.selectSnapshot(AuthState.isAdmin);
     if (!isAdmin) {
-      // redirect to home or dashboard
       this.router.navigate(['/']); 
       return false;
     }

@@ -32,9 +32,9 @@
     <div>
       <label for="role">Rôle:</label>
       <select id="role" formControlName="role">
-        <option value="user">Utilisateur</option>
-        <option value="moderator">Modérateur</option>
-        <option value="admin">Admin</option>
+        @for (role of userRoles; track role) {
+          <option [value]="role">{{ role }}</option>
+        }
       </select>
       @if (userForm.get('role')?.invalid)
       {

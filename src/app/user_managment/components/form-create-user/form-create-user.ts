@@ -7,6 +7,7 @@ import { UserApi } from '../../services/userApi/user-api';
 import { UserRecap } from '../user-recap/user-recap';
 
 import { AbstractControl, ValidationErrors } from '@angular/forms';
+import { USER_ROLES } from '../../constants/user-roles/user.role';
 
 
 
@@ -39,7 +40,9 @@ export class FormCreateUser implements OnInit
 
   submitted : boolean = false
   loading : boolean = false
-  // // isEditMode : boolean = false
+
+  
+  userRoles = USER_ROLES;
   
   userForm = new FormGroup({
     username: new FormControl('', [Validators.required, Validators.minLength(3)]),
@@ -52,7 +55,6 @@ export class FormCreateUser implements OnInit
   constructor
   (
     private userApi : UserApi,
-    private route : ActivatedRoute,
     private router : Router,
     private cdr: ChangeDetectorRef
   ) 
@@ -67,25 +69,31 @@ export class FormCreateUser implements OnInit
 
   onSubmit()
   {
-    if (!this.loading)
-    {
+    if (this.loading) return;
+    this.loading = true;
 
-      this.loading = true;
-      this.user = Object.assign(new User(), this.userForm.value)
-      
-      this.userApi.postUser(this.user).subscribe({
-        next: (response) => {
-          console.log('User created:', response);
-          this.submitted = true;
-          this.cdr.detectChanges(); // détection des changements pour que submitted mette à jour l'affichage
-          this.loading = false;
-        },
-        error: (error) => {
-          console.error('Error creating user:', error);
-          this.loading = false;
-        }
-      });
-    }
+    const prepared = this.prepareUserFromForm();
+    this.user = prepared;
+    this.submitCreate(prepared);
+  }
+
+  private prepareUserFromForm(): User {
+    return Object.assign(new User(), this.userForm.value);
+  }
+
+  private submitCreate(user: User) {
+    this.userApi.postUser(user).subscribe({
+      next: (response) => {
+        console.log('User created:', response);
+        this.submitted = true;
+        this.cdr.detectChanges();
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error creating user:', error);
+        this.loading = false;
+      }
+    });
   }
 
 

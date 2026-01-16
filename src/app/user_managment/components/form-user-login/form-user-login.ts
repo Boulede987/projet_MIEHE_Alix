@@ -28,6 +28,8 @@ export class FormUserLogin {
 
   private store = inject(Store);
 
+  loginErr : boolean = false;
+
   connexion: Signal<Boolean> = toSignal(
     this.store.select(AuthState.isConnected),
     {
@@ -44,26 +46,38 @@ constructor(private userApi: UserApi, private router: Router
 
 
   onSubmit() {
-    const { email, password } = this.userForm.getRawValue();
+    this.loginErr = false;
+    const { email, password } = this.getCredentials();
+    this.performLogin(email, password).subscribe({
+      next: () => this.onLoginSuccess(),
+      error: (err) => this.onLoginError(err)
+    });
+  }
 
-    this.userApi.userLogin(email, password).pipe(
+  private getCredentials(): { email: string; password: string } {
+    const { email, password } = this.userForm.getRawValue();
+    return { email: email ?? '', password: password ?? '' };
+  }
+
+  private performLogin(email: string, password: string) {
+    return this.userApi.userLogin(email, password).pipe(
       switchMap((response) => {
         console.log('API response received:', response);
-        return this.store.dispatch(new AuthConnexion({
-          connexion: true,
-          user: response
-        }));
+        return this.store.dispatch(new AuthConnexion({ connexion: true, user: response }));
       })
-    ).subscribe({
-      next: () => {
-        console.log('Login successful, state updated');
-        console.log('Current auth state:', this.store.selectSnapshot(AuthState.isConnected));
-        this.router.navigate(['/']);
-      },
-      error: (err) => {
-        console.error('Login error:', err);
-      }
-    });
+    );
+  }
+
+  private onLoginSuccess() {
+    this.loginErr = false;
+    console.log('Login successful, state updated');
+    console.log('Current auth state:', this.store.selectSnapshot(AuthState.isConnected));
+    this.router.navigate(['/']);
+  }
+
+  private onLoginError(err: any) {
+    this.loginErr = true;
+    console.error('Login error:', err);
   }
 
 

@@ -10,6 +10,11 @@
     <input id="password" type="password" formControlName="password">
 </div>
 
+@if (loginErr)
+{
+  <p class="error">Échec de la connexion. Vérifiez vos informations d'identification.</p>
+}
+
 <button type="submit">
     {{ 'Se connecter' }}
 </button>
