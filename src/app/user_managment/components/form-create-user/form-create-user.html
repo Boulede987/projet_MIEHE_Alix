@@ -1,0 +1,56 @@
+@if (submitted == false)
+{
+  <form [formGroup]="userForm" (ngSubmit)="onSubmit()">
+
+    <div>
+      <label for="username">Username:</label>
+      <input id="username" type="text" formControlName="username">
+      @if (userForm.get('username')?.invalid)
+      {
+        <p class="error">Le nom d'utilisateur est invalide.</p>
+      }
+    </div>
+
+    <div>
+      <label for="email">Email:</label>
+      <input id="email" type="email" formControlName="email">
+      @if (userForm.get('email')?.invalid)
+      {
+        <p class="error">L'email est invalide.</p>
+      }
+    </div>
+
+    <div>
+      <label for="password">Mot de passe:</label>
+      <input id="password" type="password" formControlName="password">
+      @if (userForm.get('password')?.invalid)
+      {
+        <p class="error">Le mot de passe doit contenir au moins 6 caractères.</p>
+      }
+    </div>
+
+    <div>
+      <label for="role">Rôle:</label>
+      <select id="role" formControlName="role">
+        <option value="user">Utilisateur</option>
+        <option value="moderator">Modérateur</option>
+        <option value="admin">Admin</option>
+      </select>
+      @if (userForm.get('role')?.invalid)
+      {
+        <p class="error">Veuillez sélectionner un rôle.</p>
+      }
+    </div>
+
+    <button type="submit" [disabled]="userForm.invalid">
+        {{ 'Soumettre' }}
+    </button>
+
+    <button type="button" (click)="cancel()">Annuler</button>
+
+  </form>
+}
+@else
+{
+  <app-user-recap [user]="user ! " [isRecap]="true"></app-user-recap>
+}

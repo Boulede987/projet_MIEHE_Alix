@@ -1,0 +1,56 @@
+<div class="recap-card">
+  <!-- Si c'est pour afficher un récapitulatif après déclaration -->
+  @if (isRecap)
+  {
+    <h2>Déclaration réussie</h2>
+
+    <p><strong>Titre:</strong> {{ pollution.titre }}</p><!-- Le titre est un champ -->
+  }
+  @else 
+  {
+    <!-- Autrement, on affiche le titre en tant que... titre. -->
+    <h2>{{ pollution.titre }}</h2>
+  }
+
+  <!-- Si c'est un recap, on veux les details. Sinon, on laisse l'utilisateur choisir de l'afficher ou non -->
+  @if (isRecap || showDetail)
+  {
+    <p><strong>Type:</strong> {{ pollution.type_pollution  }}</p>
+    <p><strong>Description:</strong> {{ pollution.description }}</p>
+    <p><strong>Date:</strong> {{ pollution.date_observation | date:'mediumDate' }}</p>
+    <p><strong>Lieu:</strong> {{ pollution.lieu }}</p>
+    <p><strong>Longitude:</strong> {{ pollution.longitude }}</p>
+    <p><strong>Latitude:</strong> {{ pollution.latitude }}</p>
+
+    @if (pollution.photo_url) 
+    {
+      <div class="photo">
+        <strong>Photo:</strong><br>
+        <img [src]="pollution.photo_url" alt="Pollution Photo" width="300">
+      </div>
+    }
+  }
+
+  <!-- Si on veux pouvoir afficher ou cacher le detail, ce n'est pas un recap après déclaration -->
+  @if (isRecap == false)
+  {
+    @if (showDetail)
+    {
+      <button (click)="changeShowDetail(false)">
+        Cacher le détail
+      </button>
+    }
+    @else
+    {
+      <button (click)="changeShowDetail(true)">
+        Afficher le détail
+      </button>
+    }
+  }
+   <!-- Si c'est un recap, on veux permettre à l'utilisateur de retourner à la page d'acceuil -->
+  @else
+  {
+    <button type="button" (click)="cancel()">Retour</button>
+  }
+
+</div>

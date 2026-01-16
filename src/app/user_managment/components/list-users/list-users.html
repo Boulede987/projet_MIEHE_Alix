@@ -1,0 +1,18 @@
+<input type="text" [formControl]="searchFilter" placeholder="Rechercher..." />
+
+
+@for (user of (filteredUsers$ | async); track users$) 
+{
+    <app-user-recap [user]="user"></app-user-recap>
+    
+    <!-- <button (click)="onDelete(user)">
+        Supprimer
+    </button> -->
+    <!-- <button (click)="onEdit(user)">
+        Modifier
+    </button> -->
+}
+@empty
+{
+    <p>Aucun utilisateurs trouvés!</p>
+}

@@ -1,0 +1,43 @@
+<div class="recap-card">
+  <!-- Si c'est pour afficher un récapitulatif après soumission -->
+  @if (isRecap)
+  {
+    <h2>Utilisateur enregistré</h2>
+
+    <p><strong>Nom d'utilisateur:</strong> {{ user.username }}</p>
+  }
+  @else 
+  {
+    <!-- Autrement, on affiche le nom d'utilisateur en tant que titre -->
+    <h2>{{ user.username }}</h2>
+  }
+
+  <!-- Si c'est un recap, on veut les détails. Sinon, possibilité de basculer -->
+  @if (isRecap || showDetail)
+  {
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Rôle:</strong> {{ user.role }}</p>
+  }
+
+  <!-- Si on veut pouvoir afficher ou cacher le détail, et ce n'est pas un recap -->
+  @if (isRecap == false)
+  {
+    @if (showDetail)
+    {
+      <button (click)="changeShowDetail(false)">
+        Cacher le détail
+      </button>
+    }
+    @else
+    {
+      <button (click)="changeShowDetail(true)">
+        Afficher le détail
+      </button>
+    }
+  }
+  <!-- Si c'est un recap, on veut permettre à l'utilisateur de retourner à la page d'accueil -->
+  @else
+  {
+    <button type="button" (click)="cancel()">Retour</button>
+  }
+</div>

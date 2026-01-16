@@ -1,0 +1,98 @@
+
+@if (submitted == false)
+{
+  <form [formGroup]="pollutionForm" (ngSubmit)="onSubmit()">
+
+    <div>
+      <label for="titre">Titre:</label>
+      <input id="titre" type="text" formControlName="titre">
+      @if (pollutionForm.get('titre')?.invalid)
+      {
+        <p class="error">Le titre est invalide.</p>
+      }
+    </div>
+
+    <div>
+      <label for="type">Type:</label>
+      <select id="type" formControlName="type_pollution">
+        <option value="Plastique">Plastique</option>
+        <option value="Chimique">Chimique</option>
+        <option value="Dépôt sauvage">Dépôt sauvage</option>
+        <option value="Eau">Eau</option>
+        <option value="Air">Air</option>
+        <option value="Autre">Autre</option>
+      </select>
+      @if (pollutionForm.get('type_pollution')?.invalid)
+      {
+        <p class="error">Sélectionnez un type.</p>
+      }
+    </div>
+
+    <div>
+      <label for="description">Description:</label>
+      <textarea id="description" formControlName="description"></textarea>
+      @if (pollutionForm.get('description')?.invalid)
+      {
+        <p class="error">La description est invalide.</p>
+      }
+    </div>
+
+    <div>
+      <label for="date">Date:</label>
+      <input id="date" type="date" formControlName="date_observation">
+      @if (pollutionForm.get('date_observation')?.invalid)
+      {
+        <p class="error">La date est invalide.</p>
+      }
+    </div>
+
+    <div>
+      <label for="lieu">Lieu:</label>
+      <input id="lieu" type="text" formControlName="lieu">
+      @if (pollutionForm.get('lieu')?.invalid)
+      {
+        <p class="error">Le lieu est invalide.</p>
+      }
+    </div>
+
+    <div>
+      <label for="longitude">Longitude:</label>
+      <input id="longitude" type="number" formControlName="longitude" step="any">
+      @if (pollutionForm.get('longitude')?.invalid)
+      {
+        <p class="error">La longitude est invalide.</p>
+      }
+    </div>
+
+    <div>
+      <label for="latitude">Latitude:</label>
+      <input id="latitude" type="number" formControlName="latitude" step="any">
+      @if (pollutionForm.get('latitude')?.invalid)
+      {
+        <p class="error">La latitude est invalide.</p>
+      }
+    </div>
+
+    <div>
+      <label for="photo">Photo URL:</label>
+      <input id="photo" type="text" formControlName="photo">
+      @if (pollutionForm.get('photo')?.invalid)
+      {
+        <p class="error">La photo est invalide.</p>
+      }
+    </div>
+
+    <button type="submit" [disabled]="pollutionForm.invalid">
+      {{ isEditMode ? 'Mettre à jour' : 'Soumettre' }}
+    </button>
+    
+    <button type="button" (click)="cancel()">Annuler</button>
+    
+  </form>
+
+}
+@else
+{
+  <!-- "!" après pollution pour signifier qu'on est sûr qu'il n'est pas undefined -->
+  <app-pollution-recap [pollution]="pollution ! " [isRecap]="true"></app-pollution-recap>
+}

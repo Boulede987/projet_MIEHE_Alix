@@ -1,0 +1,134 @@
+[
+    {
+        "id": "1",
+        "titre": "Fuite d'huile industrielle",
+        "type": "Eau",
+        "description": "Déversement important d'huile de moteur dans le canal, nappe visible sur environ 50 mètres",
+        "date": "2025-10-15",
+        "lieu": "Canal de la Bruche, Strasbourg",
+        "longitude": "7.7521",
+        "latitude": "48.5734",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "2",
+        "titre": "Émissions de fumée noire",
+        "type": "Air",
+        "description": "Usine émettant de la fumée noire épaisse depuis plusieurs jours, odeur désagréable dans le quartier",
+        "date": "2025-10-12",
+        "lieu": "Zone industrielle Nord, Haguenau",
+        "longitude": "7.7897",
+        "latitude": "48.8156",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "3",
+        "titre": "Déchets plastiques sur la plage",
+        "type": "Plastique",
+        "description": "Accumulation de bouteilles, sacs et emballages plastiques le long de la berge",
+        "date": "2025-10-10",
+        "lieu": "Plage du Rhin, Drusenheim",
+        "longitude": "7.9534",
+        "latitude": "48.7623",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "4",
+        "titre": "Produits chimiques abandonnés",
+        "type": "Chimique",
+        "description": "Plusieurs bidons de produits chimiques non identifiés abandonnés près d'un terrain vague",
+        "date": "2025-10-08",
+        "lieu": "Rue de l'Industrie, Saverne",
+        "longitude": "7.3628",
+        "latitude": "48.7417",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "5",
+        "titre": "Dépôt de gravats et déchets",
+        "type": "Dépôt sauvage",
+        "description": "Tas important de gravats, vieux meubles et déchets de construction abandonnés en forêt",
+        "date": "2025-10-05",
+        "lieu": "Forêt de Haguenau, chemin forestier",
+        "longitude": "7.8234",
+        "latitude": "48.7891",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "6",
+        "titre": "Pollution de rivière par effluents",
+        "type": "Eau",
+        "description": "Eau trouble avec mousse blanche suspecte, poissons morts observés sur 200m",
+        "date": "2025-10-03",
+        "lieu": "Rivière Zorn, Hochfelden",
+        "longitude": "7.5678",
+        "latitude": "48.7634",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "7",
+        "titre": "Brûlage de déchets plastiques",
+        "type": "Air",
+        "description": "Fumée toxique provenant d'un brûlage illégal de déchets plastiques dans un jardin privé",
+        "date": "2025-09-30",
+        "lieu": "Route de Bouxwiller, Ingwiller",
+        "longitude": "7.4823",
+        "latitude": "48.8734",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "8",
+        "titre": "Emballages abandonnés en nature",
+        "type": "Plastique",
+        "description": "Zone pique-nique envahie de bouteilles plastiques, emballages alimentaires et sacs jetables",
+        "date": "2025-09-28",
+        "lieu": "Aire de repos A4, près de Saverne",
+        "longitude": "7.3456",
+        "latitude": "48.7234",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "9",
+        "titre": "Déversement de solvants",
+        "type": "Chimique",
+        "description": "Traces de solvants industriels au sol, forte odeur chimique persistante",
+        "date": "2025-09-25",
+        "lieu": "Parking industriel, Brumath",
+        "longitude": "7.7123",
+        "latitude": "48.7312",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "10",
+        "titre": "Électroménager abandonné",
+        "type": "Dépôt sauvage",
+        "description": "Réfrigérateurs, lave-linge et autres appareils électroménagers jetés illégalement",
+        "date": "2025-09-22",
+        "lieu": "Chemin rural, Mommenheim",
+        "longitude": "7.6234",
+        "latitude": "48.7456",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "11",
+        "titre": "Contamination agricole du ruisseau",
+        "type": "Eau",
+        "description": "Ruisseau présentant une couleur anormale verte, suspicion d'engrais ou pesticides",
+        "date": "2025-09-20",
+        "lieu": "Ruisseau près des champs, Wingersheim",
+        "longitude": "7.6789",
+        "latitude": "48.7567",
+        "photo": "https://picsum.photos/200"
+    },
+    {
+        "id": "12",
+        "titre": "Pollution atmosphérique trafic routier",
+        "type": "Air",
+        "description": "Pic de pollution aux particules fines près de l'autoroute, visibilité réduite",
+        "date": "2025-09-18",
+        "lieu": "Autoroute A4, sortie Strasbourg-Ouest",
+        "longitude": "7.6912",
+        "latitude": "48.5823",
+        "photo": "https://picsum.photos/200"
+    }
+]

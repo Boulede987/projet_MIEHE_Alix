@@ -1,0 +1,8 @@
+@for (pollution of ( favoritePollutions$ | async); track favoritePollutions$ ) 
+{
+    <app-pollution-recap [pollution]="pollution"></app-pollution-recap>
+}
+@empty
+{
+    <p>Aucune pollutions trouvées!</p>
+}

@@ -1,0 +1,9 @@
+
+  <button routerLink="/pollution/list">Lister les pollutions</button>
+
+  @if (isConnected$ | async) {
+    <button routerLink="/pollution/create">Déclarer une pollution</button>
+    <button routerLink="/pollution/favorites">Lister les pollutions favories</button>
+    <app-favorite-pollutions-tag></app-favorite-pollutions-tag>
+  }
+

@@ -1,0 +1,77 @@
+/* You can add global styles to this file, and also import other style files */
+/* ====== General layout ====== */
+body {
+  font-family: Arial, sans-serif;
+  background: #f5f6fa;
+  padding: 2rem;
+  color: #333;
+}
+
+/* ====== Form container ====== */
+form {
+  max-width: 600px;
+  margin: 0 auto;
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+form div {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+input, select, textarea {
+  padding: 0.7rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+  border-color: #0077cc;
+  outline: none;
+}
+
+/* ====== Buttons ====== */
+button {
+  background: #0077cc;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 0.9rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+button:hover:not(:disabled) {
+  background: #005fa3;
+}
+
+/* ====== Error messages ====== */
+.error {
+  color: #d93025;
+  font-size: 0.9rem;
+  margin-top: 0.4rem;
+}
+
+input.ng-invalid.ng-touched,
+select.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-touched {
+  border-color: #d93025;
+  background: #fff5f5;
+}
