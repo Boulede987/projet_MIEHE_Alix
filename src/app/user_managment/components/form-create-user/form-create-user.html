@@ -31,16 +31,18 @@
 
     <div>
       <label for="role">Rôle:</label>
+
       <select id="role" formControlName="role">
-        @for (role of userRoles; track role) {
+        @for (role of allowedRoles$ | async; track role) {
           <option [value]="role">{{ role }}</option>
         }
       </select>
-      @if (userForm.get('role')?.invalid)
-      {
+
+      @if (userForm.get('role')?.invalid) {
         <p class="error">Veuillez sélectionner un rôle.</p>
       }
     </div>
+
 
     <button type="submit" [disabled]="userForm.invalid">
         {{ 'Soumettre' }}

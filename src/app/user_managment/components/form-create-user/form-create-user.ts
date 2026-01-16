@@ -1,6 +1,14 @@
-import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
+import { Router } from '@angular/router';
+import { AsyncPipe } from '@angular/common';
+
+import { Store } from '@ngxs/store';
+import { Observable } from 'rxjs';
+import { map, take } from 'rxjs/operators';
+
+import { AuthState } from '../../../auth_managment/authentification-store/states/auth.state';
+import { UserRole } from '../../constants/user-roles/user.role';
 
 import { User } from '../../classes/user/user';
 import { UserApi } from '../../services/userApi/user-api';
@@ -30,7 +38,7 @@ export function strictPasswordValidator(control: AbstractControl): ValidationErr
 
 @Component({
   selector: 'app-form-create-user',
-  imports: [ReactiveFormsModule, UserRecap],
+  imports: [ReactiveFormsModule, UserRecap, AsyncPipe],
   templateUrl: './form-create-user.html',
   styleUrl: './form-create-user.scss'
 })
@@ -41,14 +49,27 @@ export class FormCreateUser implements OnInit
   submitted : boolean = false
   loading : boolean = false
 
+  private readonly store = inject(Store);
+
+  readonly isAdmin$: Observable<boolean> = this.store.select(AuthState.isAdmin);
+
+    
+readonly allowedRoles$: Observable<readonly UserRole[]> =
+  this.isAdmin$.pipe(
+    map(isAdmin =>
+      isAdmin
+        ? USER_ROLES
+        : ['user']
+    )
+  );
   
   readonly userRoles = USER_ROLES;
   
   readonly userForm = new FormGroup({
-    username: new FormControl('', [Validators.required, Validators.minLength(3)]),
+    username: new FormControl('', Validators.required),
     email: new FormControl('', [Validators.required, strictEmailValidator]),
-    password: new FormControl('', [Validators.required, Validators.minLength(6), strictPasswordValidator]),
-    role: new FormControl('user', [Validators.required])
+    password: new FormControl('', [Validators.required, strictPasswordValidator]),
+    role: new FormControl<UserRole>('user', Validators.required),
   });
 
 
@@ -81,20 +102,27 @@ export class FormCreateUser implements OnInit
     return Object.assign(new User(), this.userForm.value);
   }
 
-  private submitCreate(user: User) {
-    this.userApi.postUser(user).subscribe({
-      next: (response) => {
-        console.log('User created:', response);
-        this.submitted = true;
-        this.cdr.detectChanges();
+  private submitCreate(user: User): void {
+    this.isAdmin$.pipe(take(1)).subscribe(isAdmin => {
+
+      if (!isAdmin && user.role !== 'user') {
+        console.warn('Unauthorized role creation attempt');
         this.loading = false;
-      },
-      error: (error) => {
-        console.error('Error creating user:', error);
-        this.loading = false;
+        return;
       }
+
+      this.userApi.postUser(user).subscribe({
+        next: response => {
+          this.submitted = true;
+          this.loading = false;
+        },
+        error: () => {
+          this.loading = false;
+        },
+      });
     });
   }
+
 
 
 

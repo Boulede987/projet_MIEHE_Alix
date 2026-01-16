@@ -1,3 +1,2 @@
-export type UserRole = 'admin' | 'moderator' | 'user';
-
-export const USER_ROLES: UserRole[] = ['admin', 'moderator', 'user'];
+export const USER_ROLES = ['user', 'moderator', 'admin'] as const;
+export type UserRole = typeof USER_ROLES[number];
