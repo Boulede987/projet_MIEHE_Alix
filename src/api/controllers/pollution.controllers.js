@@ -1,9 +1,9 @@
 const { v4: uuidv4 } = require ("uuid");
 
-
 const db = require("../models");
 const Pollution = db.pollution;
 const Op = db.Sequelize.Op;
+
 
 exports.get = (req, res) => 
 {
@@ -26,7 +26,18 @@ exports.get = (req, res) =>
   Pollution.findAll({ where })
   .then(
     data => {
-      res.send(data);
+      // convert binary photo_data to base64 data URL for client
+      const mapped = data.map(d => {
+        const obj = d.toJSON();
+        if (obj.photo_data) {
+          const mime = obj.photo_mime || 'image/jpeg';
+          obj.photo_base64 = `data:${mime};base64,${Buffer.from(obj.photo_data).toString('base64')}`;
+        }
+        delete obj.photo_data;
+        delete obj.photo_mime;
+        return obj;
+      });
+      res.send(mapped);
     }
   )
   .catch(
@@ -50,7 +61,7 @@ exports.getById = (req, res) =>
 {
   const id = req.params.id;
   
-  Pollution.findByPk(id)
+  Pollution.findByPk(id, { include: [{ model: db.user, as: 'user', attributes: ['id','username','email'] }] })
   .then(
     data => {
       if (!data) {
@@ -61,7 +72,14 @@ exports.getById = (req, res) =>
           }
         );
       }
-      res.send(data);
+      const obj = data.toJSON();
+      if (obj.photo_data) {
+        const mime = obj.photo_mime || 'image/jpeg';
+        obj.photo_base64 = `data:${mime};base64,${Buffer.from(obj.photo_data).toString('base64')}`;
+      }
+      delete obj.photo_data;
+      delete obj.photo_mime;
+      res.send(obj);
     }
   )
   .catch(
@@ -101,8 +119,32 @@ exports.post = (req, res) => {
     description: req.body.description,
     latitude: req.body.latitude,
     longitude: req.body.longitude,
-    photo_url: req.body.photo_url
+    photo_data: null,
+    photo_mime: null
   };
+
+  // attach user id if authenticated
+  if (req.user && req.user.id) {
+    pollution.userId = req.user.id;
+  }
+
+  // If client sent a base64 image in `photo_base64`, store binary and mime in DB
+  if (req.body.photo_base64) {
+    try {
+      const raw = req.body.photo_base64;
+      let base64Data = raw;
+      let mime = 'image/jpeg';
+      const matches = raw.match(/^data:(.+);base64,(.+)$/);
+      if (matches) {
+        mime = matches[1];
+        base64Data = matches[2];
+      }
+      pollution.photo_data = Buffer.from(base64Data, 'base64');
+      pollution.photo_mime = mime;
+    } catch (e) {
+      console.error('Failed to process base64 image:', e);
+    }
+  }
 
   // Save Pollution in the database
   Pollution.create(pollution)
@@ -130,8 +172,27 @@ exports.put = (req, res) => {
     return;
   }
 
+  // If client sent a new base64 image for update, store binary and mime in the update body
+  const updateBody = { ...req.body };
+  if (req.body.photo_base64) {
+    try {
+      const raw = req.body.photo_base64;
+      let base64Data = raw;
+      let mime = 'image/jpeg';
+      const matches = raw.match(/^data:(.+);base64,(.+)$/);
+      if (matches) {
+        mime = matches[1];
+        base64Data = matches[2];
+      }
+      updateBody.photo_data = Buffer.from(base64Data, 'base64');
+      updateBody.photo_mime = mime;
+    } catch (e) {
+      console.error('Failed to process base64 image on update:', e);
+    }
+  }
+
   // Update Pollution in the database
-  Pollution.update(req.body, {
+  Pollution.update(updateBody, {
     where: { id: id }
   })
     .then(num => {

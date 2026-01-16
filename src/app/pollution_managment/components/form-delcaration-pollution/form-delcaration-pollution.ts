@@ -1,10 +1,13 @@
-import { Component, Input, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, ChangeDetectorRef, inject } from '@angular/core';
 import {FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import { Store } from '@ngxs/store';
+import { AuthState } from '../../../auth_managment/authentification-store/states/auth.state';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { SubmittedPollution } from '../../classes/submittedPollution/submitted-pollution';
 import { PollutionRecap } from '../pollution-recap/pollution-recap';
 import { PollutionAPI } from '../../services/pollution-api';
+import { POLLUTION_TYPES, PollutionType } from '../../classes/submittedPollution/submitted-pollution';
 
 @Component({
   selector: 'app-form-delcaration-pollution',
@@ -19,6 +22,8 @@ export class FormDelcarationPollution implements OnInit {
   submitted : boolean = false
   isEditMode : boolean = false
   loading : boolean = false
+  photoBase64: string | null = null
+  pollutionTypes = POLLUTION_TYPES;
   
   pollutionForm = new FormGroup({
     // Validators.required -> oblige re remplir le formulaire, d'une certaine manière
@@ -29,8 +34,7 @@ export class FormDelcarationPollution implements OnInit {
     date_observation: new FormControl('', [Validators.required]),
     lieu: new FormControl('', [Validators.required]),
     longitude: new FormControl('', [Validators.required, Validators.min(-180), Validators.max(180)]),
-    latitude: new FormControl('', [Validators.required, Validators.min(-90), Validators.max(90)]),
-    photo: new FormControl('')
+    latitude: new FormControl('', [Validators.required, Validators.min(-90), Validators.max(90)])
   })
 
 
@@ -44,6 +48,9 @@ export class FormDelcarationPollution implements OnInit {
   {
     //
   }
+
+  // inject store for user info
+  private store = inject(Store);
 
 
   ngOnInit() 
@@ -75,8 +82,7 @@ export class FormDelcarationPollution implements OnInit {
             date_observation: this.pollution.date_observation.toString(),
             lieu: this.pollution.lieu,
             longitude: this.pollution.longitude.toString(),
-            latitude: this.pollution.latitude.toString(),
-            photo: this.pollution.photo_url
+            latitude: this.pollution.latitude.toString()
           };
 
           this.pollutionForm.patchValue(formValue); // et on les ajoutes dans le formulaire pour le pré remplir
@@ -101,6 +107,17 @@ export class FormDelcarationPollution implements OnInit {
         const pollutionId = parseInt(this.route.snapshot.paramMap.get('id')!);
         this.pollution.id = pollutionId; 
         
+        // attach base64 image if provided
+        if (this.photoBase64 && this.pollution) {
+          this.pollution.photo_base64 = this.photoBase64;
+        }
+
+        // attach current user id if available
+        const currentUser = this.store.selectSnapshot(AuthState.getUser);
+        if (currentUser && currentUser.id && this.pollution) {
+          this.pollution.userId = currentUser.id;
+        }
+
         this.pollutionApi.putPollution(this.pollution).subscribe({
           next: (response) => {
             console.log('Pollution updated:', response);
@@ -117,6 +134,17 @@ export class FormDelcarationPollution implements OnInit {
       else  // sinon, on est en creation
       {
         // Ne pas générer l'ID manuellement, laissez la base de données le faire (autoIncrement)
+        // attach base64 image if provided
+        if (this.photoBase64 && this.pollution) {
+          this.pollution.photo_base64 = this.photoBase64;
+        }
+
+        // attach current user id if available
+        const currentUser = this.store.selectSnapshot(AuthState.getUser);
+        if (currentUser && currentUser.id && this.pollution) {
+          this.pollution.userId = currentUser.id;
+        }
+
         this.pollutionApi.postPollution(this.pollution).subscribe({
           next: (response) => {
             console.log('Pollution created:', response);
@@ -131,6 +159,61 @@ export class FormDelcarationPollution implements OnInit {
         });
       }
     }
+  }
+
+
+  onFileChange(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+    const file = input.files[0];
+    this.compressImage(file, 1024, 0.7)
+      .then(dataUrl => {
+        this.photoBase64 = dataUrl;
+        this.cdr.detectChanges();
+      })
+      .catch(err => {
+        console.error('Image compression failed', err);
+      });
+  }
+
+  private compressImage(file: File, maxDimension = 1024, quality = 0.7): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = () => {
+        const img = new Image();
+        img.onerror = reject;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let { width, height } = img;
+          if (width > maxDimension || height > maxDimension) {
+            const ratio = width / height;
+            if (ratio > 1) {
+              width = maxDimension;
+              height = Math.round(maxDimension / ratio);
+            } else {
+              height = maxDimension;
+              width = Math.round(maxDimension * ratio);
+            }
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) return reject(new Error('Canvas not supported'));
+          ctx.drawImage(img, 0, 0, width, height);
+          // convert to jpeg to reduce size
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          resolve(dataUrl);
+        };
+        img.src = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // returns a source for preview: either the newly selected base64 or existing photo_base64 from server
+  previewSrc(): string | null {
+    return this.photoBase64 ?? (this.pollution ? this.pollution.photo_base64 ?? null : null);
   }
 
 

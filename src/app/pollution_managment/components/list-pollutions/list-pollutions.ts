@@ -12,6 +12,7 @@ import { SubmittedPollution } from '../../classes/submittedPollution/submitted-p
 import { FavoritePollutionsState } from '../../pollution-store/states/favorite-pollutions.state';
 import { AddFavoritePollution, RemoveFavoritePollution } from '../../pollution-store/actions/favorite-pollution.action';
 import { AuthState } from '../../../auth_managment/authentification-store/states/auth.state';
+import { POLLUTION_TYPES, PollutionType } from '../../classes/submittedPollution/submitted-pollution';
 
 @Component({
   selector: 'app-list-pollutions',
@@ -31,6 +32,7 @@ export class ListPollutions implements OnInit {
   // FILTER
   searchFilter = new FormControl('')
   typeFilter = new FormControl('')
+  pollutionTypes = POLLUTION_TYPES;
 
   showForm : boolean = false // pour permette l'édition via formulaire
 

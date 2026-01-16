@@ -29,8 +29,23 @@ module.exports = (sequelize, Sequelize) => {
     longitude: {
       type: Sequelize.DECIMAL(9,6)
     },
-    photo_url: {
+    // store image binary and mime instead of URL
+    photo_data: {
+      type: Sequelize.BLOB('long')
+    },
+    photo_mime: {
       type: Sequelize.STRING
+    }
+    ,
+    userId: {
+      type: Sequelize.INTEGER,
+      allowNull: true,
+      references: {
+        model: 'users',
+        key: 'id'
+      },
+      onDelete: 'SET NULL',
+      onUpdate: 'CASCADE'
     }
   });
 

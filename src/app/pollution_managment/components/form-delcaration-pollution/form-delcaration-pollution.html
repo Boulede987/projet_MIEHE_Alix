@@ -15,12 +15,9 @@
     <div>
       <label for="type">Type:</label>
       <select id="type" formControlName="type_pollution">
-        <option value="Plastique">Plastique</option>
-        <option value="Chimique">Chimique</option>
-        <option value="Dépôt sauvage">Dépôt sauvage</option>
-        <option value="Eau">Eau</option>
-        <option value="Air">Air</option>
-        <option value="Autre">Autre</option>
+        @for (type of pollutionTypes; track type) {
+          <option [value]="type">{{ type }}</option>
+        }
       </select>
       @if (pollutionForm.get('type_pollution')?.invalid)
       {
@@ -74,11 +71,17 @@
     </div>
 
     <div>
-      <label for="photo">Photo URL:</label>
-      <input id="photo" type="text" formControlName="photo">
-      @if (pollutionForm.get('photo')?.invalid)
+      <div>
+        <label for="photoFile">Upload image:</label>
+        <input id="photoFile" type="file" (change)="onFileChange($event)" accept="image/*" />
+      </div>
+
+      @if (previewSrc())
       {
-        <p class="error">La photo est invalide.</p>
+        <div class="image-preview">
+          <label>Aperçu :</label>
+          <img src="{{ previewSrc() }}" alt="Aperçu" style="max-width:200px;max-height:200px;display:block;margin-top:8px;" />
+        </div>
       }
     </div>
 

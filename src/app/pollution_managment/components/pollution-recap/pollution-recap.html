@@ -10,6 +10,12 @@
   {
     <!-- Autrement, on affiche le titre en tant que... titre. -->
     <h2>{{ pollution.titre }}</h2>
+    @if (pollution.photo_base64)
+    {
+      <div class="thumb">
+        <img [src]="pollution.photo_base64" alt="Miniature" style="max-width:120px;max-height:80px;display:block;margin-top:6px;" />
+      </div>
+    }
   }
 
   <!-- Si c'est un recap, on veux les details. Sinon, on laisse l'utilisateur choisir de l'afficher ou non -->
@@ -22,11 +28,11 @@
     <p><strong>Longitude:</strong> {{ pollution.longitude }}</p>
     <p><strong>Latitude:</strong> {{ pollution.latitude }}</p>
 
-    @if (pollution.photo_url) 
+    @if (pollution.photo_base64) 
     {
       <div class="photo">
         <strong>Photo:</strong><br>
-        <img [src]="pollution.photo_url" alt="Pollution Photo" width="300">
+        <img [src]="pollution.photo_base64" alt="Pollution Photo" width="300">
       </div>
     }
   }
