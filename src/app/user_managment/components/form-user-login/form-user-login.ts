@@ -26,11 +26,11 @@ export class FormUserLogin {
   });
 
 
-  private store = inject(Store);
+  private readonly store = inject(Store);
 
   loginErr : boolean = false;
 
-  connexion: Signal<Boolean> = toSignal(
+  readonly connexion: Signal<Boolean> = toSignal(
     this.store.select(AuthState.isConnected),
     {
       initialValue: false,
@@ -75,7 +75,7 @@ constructor(private userApi: UserApi, private router: Router
     this.router.navigate(['/']);
   }
 
-  private onLoginError(err: any) {
+  private onLoginError(err: unknown) {
     this.loginErr = true;
     console.error('Login error:', err);
   }
