@@ -18,6 +18,11 @@ export class UserApi
     return this.http.get<User[]>(environment.listUsers)
   }
 
+  public getUserById(id: number): Observable<User> 
+  {
+    return this.http.get<User>(`${environment.listUsers}/${id}`)
+  }
+
   public postUser (user : User) : Observable<User> 
   {
     return this.http.post<User>(environment.listUsers, user)

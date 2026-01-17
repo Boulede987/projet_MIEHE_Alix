@@ -1,31 +1,44 @@
-import { Component, Input } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { Component, Input, OnInit } from '@angular/core';
+import { DatePipe, AsyncPipe } from '@angular/common';
 import { Router } from '@angular/router';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { SubmittedPollution } from '../../classes/submittedPollution/submitted-pollution';
+import { UserApi } from '../../../user_managment/services/userApi/user-api';
 
 @Component({
   selector: 'app-pollution-recap',
-  imports: [DatePipe],
+  imports: [DatePipe, AsyncPipe],
   templateUrl: './pollution-recap.html',
   styleUrl: './pollution-recap.scss'
 })
-export class PollutionRecap {
+export class PollutionRecap implements OnInit {
 
-  @Input({ required: true }) pollution ! : SubmittedPollution
-  @Input({ required: false }) isRecap : boolean = false 
+  @Input({ required: true }) pollution!: SubmittedPollution
+  @Input({ required: false }) isRecap: boolean = false 
 
-  showDetail : boolean = false
+  showDetail: boolean = false
+  username$?: Observable<string | null>
 
-  constructor
-  (
-    private router: Router
-  )
-  {
+  constructor(
+    private router: Router,
+    private userApi: UserApi
+  ) {
     //
   }
 
-  changeShowDetail(show : boolean)
-  {
+  ngOnInit() {
+    if (this.pollution.userId) {
+      this.username$ = this.userApi.getUserById(this.pollution.userId).pipe(
+        map(user => user.username),
+        catchError(() => of(null))
+      );
+    } else {
+      this.username$ = of(null);
+    }
+  }
+
+  changeShowDetail(show: boolean) {
     this.showDetail = show
   }
 

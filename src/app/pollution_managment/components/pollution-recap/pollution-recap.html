@@ -1,14 +1,12 @@
 <div class="recap-card">
-  <!-- Si c'est pour afficher un récapitulatif après déclaration -->
   @if (isRecap)
   {
     <h2>Déclaration réussie</h2>
 
-    <p><strong>Titre:</strong> {{ pollution.titre }}</p><!-- Le titre est un champ -->
+    <p><strong>Titre:</strong> {{ pollution.titre }}</p>
   }
   @else 
   {
-    <!-- Autrement, on affiche le titre en tant que... titre. -->
     <h2>{{ pollution.titre }}</h2>
     @if (pollution.photo_base64)
     {
@@ -18,7 +16,6 @@
     }
   }
 
-  <!-- Si c'est un recap, on veux les details. Sinon, on laisse l'utilisateur choisir de l'afficher ou non -->
   @if (isRecap || showDetail)
   {
     <p><strong>Type:</strong> {{ pollution.type_pollution  }}</p>
@@ -35,9 +32,15 @@
         <img [src]="pollution.photo_base64" alt="Pollution Photo" width="300">
       </div>
     }
+
+    @if (username$ | async; as username) 
+    {
+      <div class="pollution-author">
+        Posted by: {{ username }}
+      </div>
+    }
   }
 
-  <!-- Si on veux pouvoir afficher ou cacher le detail, ce n'est pas un recap après déclaration -->
   @if (isRecap == false)
   {
     @if (showDetail)
@@ -53,7 +56,6 @@
       </button>
     }
   }
-   <!-- Si c'est un recap, on veux permettre à l'utilisateur de retourner à la page d'acceuil -->
   @else
   {
     <button type="button" (click)="cancel()">Retour</button>
