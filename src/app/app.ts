@@ -18,5 +18,5 @@ import { FavoritePollutionsTag } from './pollution_managment/components/favorite
   styleUrl: './app.scss'
 })
 export class App {
-  protected readonly title = signal('TP07-Alix-MIEHE');
+  protected readonly title = signal('Projet-Alix-MIEHE');
 }
