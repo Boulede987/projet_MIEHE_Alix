@@ -13,14 +13,10 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 
-// parse requests of content-type - application/json
-// increase payload limits to allow reasonably sized base64 uploads
 app.use(express.json({ limit: '10mb' }));
 
-// parse requests of content-type - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// simple route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to CNAM application." });
 });
@@ -37,7 +33,6 @@ db.sequelize.sync()
 
 require("./routes")(app);
 
-// set port, listen for requests
 const PORT =  443;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);

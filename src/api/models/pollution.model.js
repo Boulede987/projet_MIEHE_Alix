@@ -23,13 +23,11 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.TEXT
     },
     latitude: {
-      // stocke les coordonnées GPS avec 6 décimales
       type: Sequelize.DECIMAL(9,6)
     },
     longitude: {
       type: Sequelize.DECIMAL(9,6)
     },
-    // store image binary and mime instead of URL
     photo_data: {
       type: Sequelize.BLOB('long')
     },
